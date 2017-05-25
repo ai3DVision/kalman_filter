@@ -18,12 +18,13 @@ def run_tracking_demo():
     R = 1 * np.identity(os)
     init_x = np.matrix([10, 10, 1, 0]).T
     init_V = 10 * np.identity(ss)
+    T = 15
 
+    # Generate new data
     # np.random.seed(0)
-    # T = 15
     # x, y = sample_lds(A, C, Q, R, init_x, T)
 
-    # Load from file for testing
+    # Use mat file to reproduce Murphy's example
     mat = io.loadmat('murphy_data.mat')
     x = mat['x']
     y = mat['y']
