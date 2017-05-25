@@ -99,8 +99,7 @@ def kalman_smoother(y, A, C, Q, R, init_x, init_V):
     VVsmooth[:, :, T-1] = VVfilt[:, :, T-1]
 
     for t in xrange(T-2, -1, -1):
-        xsmooth[:, [t]], Vsmooth[:, :, t], VVsmooth[:, :, t] = smooth_update(
-            xsmooth[:, [t+1]], Vsmooth[:, :, t+1], xfilt[:, [t]], Vfilt[:, :, t], Vfilt[:, :, t+1], VVfilt[:, :, t+1], A, Q)
+        xsmooth[:, [t]], Vsmooth[:, :, t], VVsmooth[:, :, t+1] = smooth_update(xsmooth[:, [t+1]], Vsmooth[:, :, t+1], xfilt[:, [t]], Vfilt[:, :, t], Vfilt[:, :, t+1], VVfilt[:, :, t+1], A, Q)
 
     return xsmooth, Vsmooth, VVsmooth, loglik
 

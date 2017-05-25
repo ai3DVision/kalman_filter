@@ -5,10 +5,13 @@ from kalman_filter import kalman_filter, kalman_smoother
 import matplotlib.pyplot as plt
 import matplotlib.mlab as mlab
 
+
 """
 Run Kevin Murphy's particle example explained here:
 http://www.cs.ubc.ca/~murphyk/Software/Kalman/kalman.html
 """
+
+
 def run_tracking_demo():
     ss = 4  # state size
     os = 2  # observation size
