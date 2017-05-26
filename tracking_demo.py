@@ -43,6 +43,7 @@ def run_tracking_demo():
     mse_dsmooth = np.sqrt(np.sum(dsmooth**2))
     print "mse_dsmooth: %f" % mse_dsmooth
 
+    # Plot 
     f, (ax1, ax2) = plt.subplots(1, 2, sharex=True,sharey=True)
     ax1.plot(x[0,:], x[1,:], 'ks-')
     ax1.plot(xfilt[0,:], xfilt[1,:], 'rx:')
