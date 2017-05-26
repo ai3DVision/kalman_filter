@@ -28,7 +28,7 @@ def run_tracking_demo():
     # x, y = sample_lds(A, C, Q, R, init_x, T)
 
     # Use mat file to reproduce Murphy's example
-    mat = io.loadmat('murphy_data.mat')
+    mat = io.loadmat('data/murphy_data.mat')
     x = mat['x']
     y = mat['y']
 
