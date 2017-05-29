@@ -12,7 +12,7 @@ http://www.cs.ubc.ca/~murphyk/Software/Kalman/kalman.html
 """
 
 
-def run_tracking_demo():
+def run_tracking_demo(filename, plot=True):
     ss = 4  # state size
     os = 2  # observation size
     A = np.matrix('1 0 1 0; 0 1 0 1; 0 0 1 0; 0 0 0 1')
@@ -28,7 +28,7 @@ def run_tracking_demo():
     # x, y = sample_lds(A, C, Q, R, init_x, T)
 
     # Use mat file to reproduce Murphy's example
-    mat = io.loadmat('data/murphy_tracking_data.mat')
+    mat = io.loadmat(filename)
     x = mat['x']
     y = mat['y']
 
@@ -44,18 +44,19 @@ def run_tracking_demo():
     print "mse_dsmooth: %f" % mse_dsmooth
 
     # Plot 
-    f, (ax1, ax2) = plt.subplots(1, 2, sharex=True,sharey=True)
-    ax1.plot(x[0,:], x[1,:], 'ks-')
-    ax1.plot(xfilt[0,:], xfilt[1,:], 'rx:')
-    ax1.set_title('Kalman Filter')
-    plot_2d_contours(ax1, xfilt, Vfilt)
+    if plot:
+        f, (ax1, ax2) = plt.subplots(1, 2, sharex=True,sharey=True)
+        ax1.plot(x[0,:], x[1,:], 'ks-')
+        ax1.plot(xfilt[0,:], xfilt[1,:], 'rx:')
+        ax1.set_title('Kalman Filter')
+        plot_2d_contours(ax1, xfilt, Vfilt)
 
-    ax2.plot(x[0,:], x[1,:], 'ks-')
-    ax2.plot(xsmooth[0,:], xsmooth[1,:], 'rx:')
-    ax2.set_title('Kalman Smoother')
-    plot_2d_contours(ax2, xsmooth, Vsmooth)
+        ax2.plot(x[0,:], x[1,:], 'ks-')
+        ax2.plot(xsmooth[0,:], xsmooth[1,:], 'rx:')
+        ax2.set_title('Kalman Smoother')
+        plot_2d_contours(ax2, xsmooth, Vsmooth)
 
-    plt.show()
+        plt.show()
 
 
 def plot_2d_contours(ax, xfit, vfit):
@@ -75,4 +76,5 @@ def plot_2d_contours(ax, xfit, vfit):
 
 
 if __name__ == '__main__':
-    run_tracking_demo()
+    run_tracking_demo('data/murphy_tracking_data.mat', plot=False)
+        

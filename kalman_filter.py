@@ -63,21 +63,29 @@ def kalman_update(A, C, Q, R, y, x, V, initial):
         xpred = x
         Vpred = V
     else:
+        # Prediction
         xpred = np.matmul(A, x)
         Vpred = np.matmul(np.matmul(A, V), A.T) + Q
 
-    e = y - np.matmul(C, xpred)  # error (innovation)
-    os = e.shape[0]
-    S = np.matmul(np.matmul(C, Vpred), C.T) + R
-    Sinv = np.linalg.inv(S)
+    # Get dimensions
+    os = y.shape[0]
     ss = V.shape[0]
-    loglik = multivariate_normal.logpdf(e.reshape([-1]), mean=np.zeros(os), cov=S)
-    K = np.matmul(np.matmul(Vpred, C.T), Sinv)  # Kalman gain matrix
-    # If there is no observation vector, set K = zeros(ss).
+
+    # Gain and innovation
+    e = y - np.matmul(C, xpred)                            # innovation
+    S = np.matmul(np.matmul(C, Vpred), C.T) + R            # innovation covariance
+    K = np.matmul(np.matmul(Vpred, C.T), np.linalg.inv(S)) # Kalman gain matrix
+    
+    # If there is no observation vector, set:
+    # K = zeros(ss)
+    
+    # Correction  
     xnew = xpred + np.matmul(K, e)
     Vnew = np.matmul((np.identity(ss) - np.matmul(K, C)), Vpred)
     VVnew = np.matmul(np.matmul((np.identity(ss) - np.matmul(K, C)), A), V)
-
+    
+    # Loglik
+    loglik = multivariate_normal.logpdf(e.reshape([-1]), mean=np.zeros(os), cov=S) 
     return xnew, Vnew, VVnew, loglik 
 
 
@@ -115,8 +123,6 @@ def smooth_update(xsmooth_future, Vsmooth_future, xfilt, Vfilt, Vfilt_future, VV
     # VVfilt_future = Cov[X_t+1,X_t|t+1]
     # A = system matrix for time t+1
     # Q = system covariance for time t+1
-    # B = input matrix for time t+1 (or [] if none)
-    # u = input vector for time t+1 (or [] if none)
     #
     # OUTPUTS:
     # xsmooth = E[X_t|T]

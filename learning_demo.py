@@ -8,7 +8,8 @@ Run Kevin Murphy's particle example explained here:
 http://www.cs.ubc.ca/~murphyk/Software/Kalman/kalman.html
 """
 
-def run_learning_demo():
+
+def run_learning_demo(filename):
     ss = 4  # state size
     os = 2  # observation size
     A = np.matrix('1 0 1 0; 0 1 0 1; 0 0 1 0; 0 0 0 1')
@@ -21,7 +22,7 @@ def run_learning_demo():
 
     # Use mat file to reproduce Murphy's example
     # (Or uncomment below to generate new data)
-    mat = io.loadmat('data/murphy_em_data.mat')
+    mat = io.loadmat(filename)
     x = mat['x']
     y = mat['y']
 
@@ -35,7 +36,7 @@ def run_learning_demo():
     # Lack of identifiability means the learned params. are often far from the true ones.
     # All that EM guarantees is that the likelihood will increase.
 
-    # Use murphy data for for reproducibility
+    # Use murphy data for reproducibility
     A1 = mat['F1']
     C1 = mat['H1']
 
@@ -49,8 +50,7 @@ def run_learning_demo():
     initV1 = init_V
     max_iter = 10
     F2, H2, Q2, R2, initx2, initV2, LL = learn_kalman(y, A1, C1, Q1, R1, initx1, initV1, max_iter)
-    
+
 
 if __name__ == '__main__':
-    run_learning_demo()
-
+    run_learning_demo('data/murphy_learning_data.mat')
