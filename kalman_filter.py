@@ -36,7 +36,7 @@ def kalman_filter(y, A, C, Q, R, init_x, init_V):
             prevx = x[:, [t-1]]
             prevV = V[:, :, t-1]
             initial = 0
-        x[:, [t]], V[:, :, t], LL, VV[:, :, t] = kalman_update(A, C, Q, R, y[:, [t]], prevx, prevV, initial)
+        x[:, [t]], V[:, :, t], VV[:, :, t], LL = kalman_update(A, C, Q, R, y[:, [t]], prevx, prevV, initial)
         loglik = loglik + LL
 
     return x, V, VV, loglik
@@ -78,7 +78,7 @@ def kalman_update(A, C, Q, R, y, x, V, initial):
     Vnew = np.matmul((np.identity(ss) - np.matmul(K, C)), Vpred)
     VVnew = np.matmul(np.matmul((np.identity(ss) - np.matmul(K, C)), A), V)
 
-    return xnew, Vnew, loglik, VVnew
+    return xnew, Vnew, VVnew, loglik 
 
 
 def kalman_smoother(y, A, C, Q, R, init_x, init_V):
@@ -86,16 +86,16 @@ def kalman_smoother(y, A, C, Q, R, init_x, init_V):
     os, T = y.shape
     ss = A.shape[0]
 
-    xsmooth = np.zeros([ss, T])
-    Vsmooth = np.zeros([ss, ss, T])
+    xsmooth  = np.zeros([ss, T])
+    Vsmooth  = np.zeros([ss, ss, T])
     VVsmooth = np.zeros([ss, ss, T])
 
     # Forward pass
     xfilt, Vfilt, VVfilt, loglik = kalman_filter(y, A, C, Q, R, init_x, init_V)
 
     # Backward pass
-    xsmooth[:, [T-1]] = xfilt[:, [T-1]]
-    Vsmooth[:, :, T-1] = Vfilt[:, :, T-1]
+    xsmooth[ :, [T-1]] = xfilt[:, [T-1]]
+    Vsmooth[ :, :, T-1] = Vfilt[:, :, T-1]
     VVsmooth[:, :, T-1] = VVfilt[:, :, T-1]
 
     for t in xrange(T-2, -1, -1):

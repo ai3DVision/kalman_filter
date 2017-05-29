@@ -6,7 +6,7 @@ def learn_kalman(data, A, C, Q, R, initx, initV, max_iter=10, verbose=True):
     thresh = 1e-4
     if data.ndim == 2:
         data = np.expand_dims(data, 3)
-
+    
     N = data.shape[2]
     ss = A.shape[0]
     os = C.shape[0]
@@ -96,7 +96,7 @@ def Estep(y, A, C, Q, R, initx, initV):
         if t > 0:
             beta = beta + np.outer(xsmooth[:, t], xsmooth[:, t - 1]) + VVsmooth[:, :, t]
 
-    gamma1 = gamma - np.outer(xsmooth[:, T-1], xsmooth[:, T-1]) - Vsmooth[:, :, T-1]
+    gamma1 = gamma - np.outer(xsmooth[:, T - 1], xsmooth[:, T - 1]) - Vsmooth[:, :, T - 1]
     gamma2 = gamma - np.outer(xsmooth[:, 0], xsmooth[:, 0]) - Vsmooth[:, :, 0]
 
     x1 = np.array([xsmooth[:, 0]]).T
