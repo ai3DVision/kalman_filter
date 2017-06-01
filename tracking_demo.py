@@ -77,4 +77,3 @@ def plot_2d_contours(ax, xfit, vfit):
 
 if __name__ == '__main__':
     run_tracking_demo('data/murphy_tracking_data.mat', plot=False)
-        

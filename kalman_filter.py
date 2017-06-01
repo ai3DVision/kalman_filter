@@ -42,6 +42,21 @@ def kalman_filter(y, A, C, Q, R, init_x, init_V):
     return x, V, VV, loglik
 
 
+def kalman_predict(A, Q, x, V):
+    # INPUTS:
+    # A - the system matrix
+    # Q - the system covariance
+    # x - E[X(t-1) | y(:, 1:t-1)] prior mean
+    # V - Cov[X(t-1) | y(:, 1:t-1)] prior covariance
+    #
+    # OUTPUTS (where X is the hidden state being estimated)
+    # xpred =   E[ X | y(:, 1:t-1) ]
+    # Vpred = Var[ X(t) | y(:, 1:t-1) ]
+    xpred = np.matmul(A, x)
+    Vpred = np.matmul(np.matmul(A, V), A.T) + Q
+    return xpred, Vpred 
+
+
 def kalman_update(A, C, Q, R, y, x, V, initial):
 
     # INPUTS:
@@ -64,8 +79,7 @@ def kalman_update(A, C, Q, R, y, x, V, initial):
         Vpred = V
     else:
         # Prediction
-        xpred = np.matmul(A, x)
-        Vpred = np.matmul(np.matmul(A, V), A.T) + Q
+        xpred,Vpred = kalman_predict(A, Q, x, V)
 
     # Get dimensions
     os = y.shape[0]
