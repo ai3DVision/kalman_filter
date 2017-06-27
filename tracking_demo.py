@@ -1,6 +1,6 @@
 import numpy as np
 import scipy.io as io
-# import sample_lds
+from sample_lds import sample_lds
 from kalman_filter import kalman_filter, kalman_smoother
 import matplotlib.pyplot as plt
 import matplotlib.mlab as mlab
@@ -23,7 +23,7 @@ def run_tracking_demo(filename, plot=True):
     init_V = 10 * np.identity(ss)
     T = 15
 
-    Generate new data
+    # Generate new data
     np.random.seed(0)
     x, y = sample_lds(A, C, Q, R, init_x, T)
 
