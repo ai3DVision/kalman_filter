@@ -23,14 +23,21 @@ def run_tracking_demo(filename, plot=True):
     init_V = 10 * np.identity(ss)
     T = 15
 
-    # Generate new data
-    # np.random.seed(0)
-    # x, y = sample_lds(A, C, Q, R, init_x, T)
+    Generate new data
+    np.random.seed(0)
+    x, y = sample_lds(A, C, Q, R, init_x, T)
 
-    # Use mat file to reproduce Murphy's example
-    mat = io.loadmat(filename)
-    x = mat['x']
-    y = mat['y']
+    # # Use mat file to reproduce Murphy's example
+    # mat = io.loadmat(filename)
+
+    # x = mat['x']
+    # y = mat['y']
+    # A = mat['F'][:,:,0]
+    # C = mat['H'][:,:,0]
+    # Q = mat['Q'][:,:,0]
+    # R = mat['R']
+    # init_x = mat['initx']
+    # init_V = mat['initV']
 
     xfilt, Vfilt, VVfilt, loglik = kalman_filter(y, A, C, Q, R, init_x, init_V)
     xsmooth, Vsmooth, VVsmooth, loglik = kalman_smoother(y, A, C, Q, R, init_x, init_V)
@@ -76,4 +83,4 @@ def plot_2d_contours(ax, xfit, vfit):
 
 
 if __name__ == '__main__':
-    run_tracking_demo('data/murphy_tracking_data.mat', plot=False)
+    run_tracking_demo('data/changing_model_test.mat', plot=False)
