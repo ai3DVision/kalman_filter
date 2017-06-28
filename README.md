@@ -1,11 +1,3 @@
-# kalman_filter
+# kalman_filter with CVI
 
-This is a kalman filter written in python, following Kevin Murphy's Matlab code here: http://www.cs.ubc.ca/~murphyk/Software/Kalman/kalman.html
-
-Code follows the structure of Murphy's matlab code closely. Install the dependencies (pip install -r requirements.txt) and run: 
-
-python tracking_demo.py 
-
-or for EM:
-
-python learning_demo.py 
+This is a python implementation of the "Kalman Filters with GLM Likelihood" as described in E.2 of "Conjugate-Computation Variational Inference: Converting Variational Inference in Non-Conjugate Models to Inferences in Conjugate Models"
