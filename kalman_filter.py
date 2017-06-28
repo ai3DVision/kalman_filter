@@ -2,7 +2,7 @@ import numpy as np
 from scipy.stats import multivariate_normal
 
 
-def kalman_filter(y, A, C, Q, R, init_x, init_V):
+def kalman_filter(y, A, C, Q, R, init_x, init_V, return_innovations=False):
 
     # INPUTS:
     # y(:,t)   - the observation at time t
@@ -30,6 +30,7 @@ def kalman_filter(y, A, C, Q, R, init_x, init_V):
     A, C, Q, R = tensorify(T, A, C, Q, R)
 
     loglik = 0
+    innovations = []
     for t in range(T):
         if t == 0:
             prevx = init_x
@@ -39,11 +40,15 @@ def kalman_filter(y, A, C, Q, R, init_x, init_V):
             prevx = x[:, [t - 1]]
             prevV = V[:, :, t - 1]
             initial = 0
-        x[:, [t]], V[:, :, t], VV[:, :, t], LL = kalman_update(A[:, :, t], C[:, :, t], Q[:, :, t], R[
+        x[:, [t]], V[:, :, t], VV[:, :, t], LL, inn = kalman_update(A[:, :, t], C[:, :, t], Q[:, :, t], R[
                                                                :, :, t], y[:, [t]], prevx, prevV, initial)
-        loglik = loglik + LL
+        loglik += LL  # loglik is a scalar, 
+        innovations += inn # inn is a list, used to calculate generalization error 
 
-    return x, V, VV, loglik
+    if return_innovations:
+        return x, V, VV, loglik, innovations
+    else:
+        return x, V, VV, loglik
 
 
 def kalman_predict(A, Q, x, V):
@@ -104,7 +109,9 @@ def kalman_update(A, C, Q, R, y, x, V, initial):
 
     # Loglik
     loglik = multivariate_normal.logpdf(e.reshape([-1]), mean=np.zeros(os), cov=S)
-    return xnew, Vnew, VVnew, loglik
+    innovation = [e]
+
+    return xnew, Vnew, VVnew, loglik, innovation
 
 
 def kalman_smoother(y, A, C, Q, R, init_x, init_V):
