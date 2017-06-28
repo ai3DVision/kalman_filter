@@ -92,7 +92,7 @@ def kalman_update(A, C, Q, R, y, x, V, initial):
     # Gain and innovation
     e = y - np.matmul(C, xpred)                            # innovation
     S = np.matmul(np.matmul(C, Vpred), C.T) + R            # innovation covariance
-    K = np.matmul(np.matmul(Vpred, C.T), np.linalg.inv(S))  # Kalman gain matrix
+    K = np.matmul(np.matmul(Vpred, C.T), np.linalg.inv(S)) # Kalman gain matrix
 
     # If there is no observation vector, set:
     # K = zeros(ss)

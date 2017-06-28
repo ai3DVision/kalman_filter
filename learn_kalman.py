@@ -1,9 +1,8 @@
 import numpy as np
-from kalman_filter import kalman_smoother
 
 
-def learn_kalman(data, A, C, Q, R, initx, initV, max_iter=10, verbose=True):
-    thresh = 1e-4
+def learn_kalman(data, A, C, Q, R, initx, initV, smoother=None, max_iter=10, verbose=True, **kwargs):
+    thresh = 1e-3
     if data.ndim == 2:
         data = np.expand_dims(data, 3)
     
@@ -43,15 +42,14 @@ def learn_kalman(data, A, C, Q, R, initx, initV, max_iter=10, verbose=True):
         for ex in range(N):
             y = data[:, :, ex]
             T = y.shape[1]
-            beta_t, gamma_t, delta_t, gamma1_t, gamma2_t, x1, V1, loglik_t = Estep(y, A, C, Q, R, initx, initV)
-
-            beta = beta + beta_t
-            gamma = gamma + gamma_t
-            delta = delta + delta_t
+            beta_t, gamma_t, delta_t, gamma1_t, gamma2_t, x1, V1, loglik_t = Estep(y, A, C, Q, R, initx, initV, smoother=smoother)
+            beta   = beta   + beta_t
+            gamma  = gamma  + gamma_t
+            delta  = delta  + delta_t
             gamma1 = gamma1 + gamma1_t
             gamma2 = gamma2 + gamma2_t
-            P1sum = P1sum + V1 + np.outer(x1, x1)
-            x1sum = x1sum + x1
+            P1sum  = P1sum  + V1 + np.outer(x1, x1)
+            x1sum  = x1sum  + x1
             loglik = loglik + loglik_t
 
         LL.append(loglik)
@@ -64,6 +62,15 @@ def learn_kalman(data, A, C, Q, R, initx, initV, max_iter=10, verbose=True):
 
         # ===========M step============
         Tsum1 = Tsum - N
+
+        # Save old values to reset if user wants to fix a matrix
+        A_old = A
+        Q_old = Q
+        C_old = C
+        R_old = R
+        initx_old = initx
+        initV_old = initV
+
         #                                              # ----------Matlab------------
         A = np.matmul(beta, np.linalg.inv(gamma1))     # A = beta * inv(gamma1);
         Q = (gamma2 - np.matmul(A, beta.T)) / Tsum1    # Q = (gamma2 - A*beta') / Tsum1;
@@ -72,6 +79,39 @@ def learn_kalman(data, A, C, Q, R, initx, initV, max_iter=10, verbose=True):
 
         initx = x1sum / N
         initV = P1sum / N - np.outer(initx, initx)
+
+
+        # Fix matrices
+        # (This is not optimized because we compute the entire matrix and throw away values)
+        for key in kwargs:
+            # Fix entire matrix
+            if key == 'fix_A' and kwargs[key] == 'full':
+                A = A_old
+            if key == 'fix_Q' and kwargs[key] == 'full':
+                Q = Q_old
+            if key == 'fix_C' and kwargs[key] == 'full':
+                C = C_old
+            if key == 'fix_R' and kwargs[key] == 'full':
+                R = R_old
+            if key == 'fix_initx' and kwargs[key] == 'full':
+                initx = initx_old
+            if key == 'fix_initV' and kwargs[key] == 'full':
+                initV = initV_old
+
+            # Learn only diagonal elements
+            if key == 'fix_A' and kwargs[key] == 'diag':
+                np.fill_diagonal(A_old, A.diagonal())
+                A = A_old
+            if key == 'fix_Q' and kwargs[key] == 'diag':
+                np.fill_diagonal(Q_old, Q.diagonal())
+                Q = Q_old
+            if key == 'fix_C' and kwargs[key] == 'diag':
+                np.fill_diagonal(C_old, C.diagonal())
+                C = C_old
+            if key == 'fix_R' and kwargs[key] == 'diag':
+                np.fill_diagonal(R_old, R.diagonal())
+                R = R_old
+
         converged = em_converged(loglik, previous_loglik, thresh)
         previous_loglik = loglik
         # -----------end of M step------------
@@ -80,16 +120,21 @@ def learn_kalman(data, A, C, Q, R, initx, initV, max_iter=10, verbose=True):
     return A, C, Q, R, initx, initV, LL
 
 
-def Estep(y, A, C, Q, R, initx, initV):
+def Estep(y, A, C, Q, R, initx, initV, smoother=None):
     # Compute the (expected) sufficient statistics for a single Kalman filter sequence.
+
     os, T = y.shape
     ss = A.shape[0]
-    [xsmooth, Vsmooth, VVsmooth, loglik] = kalman_smoother(y, A, C, Q, R, initx, initV)
+
+    [xsmooth, Vsmooth, VVsmooth, loglik] = smoother(y, A, C, Q, R, initx, initV)
+
+    # Fix transpose bug
+    VVsmooth = np.transpose(VVsmooth, (1, 0, 2))
 
     delta = np.zeros([os, ss])
     gamma = np.zeros([ss, ss])
-    beta = np.zeros([ss, ss])
-
+    beta  = np.zeros([ss, ss])
+    
     for t in range(T):
         delta = delta + np.outer(y[:, t], xsmooth[:, t])
         gamma = gamma + np.outer(xsmooth[:, t], xsmooth[:, t]) + Vsmooth[:, :, t]
@@ -101,17 +146,17 @@ def Estep(y, A, C, Q, R, initx, initV):
 
     x1 = np.array([xsmooth[:, 0]]).T
     V1 = Vsmooth[:, :, 0]
+
     return beta, gamma, delta, gamma1, gamma2, x1, V1, loglik
 
 
-def em_converged(loglik, previous_loglik, thresh=1e-4, check_increased=True):
+def em_converged(loglik, previous_loglik, thresh=1e-3, check_increased=True):
     eps = np.finfo(float).eps
     inf = float('inf')
     converged = False
     if check_increased:
         if loglik - previous_loglik < -1e-3:  # allow for a little imprecision
             print '******likelihood decreased from %6.4f to %6.4f!\n' % (previous_loglik, loglik)
-            return converged
 
     delta_loglik = abs(loglik - previous_loglik)
     avg_loglik = (abs(loglik) + abs(previous_loglik) + eps) / 2
