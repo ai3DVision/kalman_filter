@@ -64,12 +64,12 @@ def learn_kalman(data, A, C, Q, R, initx, initV, smoother=None, max_iter=10, ver
         Tsum1 = Tsum - N
 
         # Save old values to reset if user wants to fix a matrix
-        A_old = A
-        Q_old = Q
-        C_old = C
-        R_old = R
-        initx_old = initx
-        initV_old = initV
+        A_old = np.array(A)
+        Q_old = np.array(Q)
+        C_old = np.array(C)
+        R_old = np.array(R)
+        initx_old = np.array(initx)
+        initV_old = np.array(initV)
 
         #                                              # ----------Matlab------------
         A = np.matmul(beta, np.linalg.inv(gamma1))     # A = beta * inv(gamma1);
