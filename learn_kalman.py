@@ -128,9 +128,6 @@ def Estep(y, A, C, Q, R, initx, initV, smoother=None):
 
     [xsmooth, Vsmooth, VVsmooth, loglik] = smoother(y, A, C, Q, R, initx, initV)
 
-    # Fix transpose bug
-    VVsmooth = np.transpose(VVsmooth, (1, 0, 2))
-
     delta = np.zeros([os, ss])
     gamma = np.zeros([ss, ss])
     beta  = np.zeros([ss, ss])
