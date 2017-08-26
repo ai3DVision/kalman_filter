@@ -90,6 +90,10 @@ def kalman_update(A, C, Q, R, y, x, V, initial):
         # Prediction
         xpred, Vpred = kalman_predict(A, Q, x, V)
 
+    # Assure xpred is column vector
+    if xpred.ndim == 1:
+        xpred = np.expand_dims(xpred,1)
+
     # Get dimensions
     os = y.shape[0]
     ss = V.shape[0]

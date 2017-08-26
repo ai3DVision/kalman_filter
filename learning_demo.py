@@ -31,12 +31,7 @@ def run_learning_demo(filename):
     # np.random.seed(0)
     # x, y = sample_lds(A, C, Q, R, init_x, T)
 
-    # Initializing the params to sensible values is crucial.
-    # Here, we use the true values for everything except F and H,
-    # which we initialize randomly (bad idea!)
-    # Lack of identifiability means the learned params. are often far from the true ones.
-    # All that EM guarantees is that the likelihood will increase.
-
+    
     # Use murphy data for reproducibility
     A1 = mat['F1']
     C1 = mat['H1']

@@ -83,4 +83,4 @@ def plot_2d_contours(ax, xfit, vfit):
 
 
 if __name__ == '__main__':
-    run_tracking_demo('data/changing_model_test.mat', plot=False)
+    run_tracking_demo('data/changing_model_test.mat', plot=True)

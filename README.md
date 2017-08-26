@@ -1,3 +1,3 @@
 # kalman_filter with CVI
 
-This is a python implementation of the "Kalman Filters with GLM Likelihood" as described in E.2 of "Conjugate-Computation Variational Inference: Converting Variational Inference in Non-Conjugate Models to Inferences in Conjugate Models"
+This is a python implementation of the Kevin Murphy's Kalman Filter toolbox. Run `python tracking_demo.py` to run the kalman filter + smoother, and run `python learning_demo.py` to learn the parameters via EM. 
